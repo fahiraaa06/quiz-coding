@@ -105,10 +105,10 @@ def _render_quiz(state) -> str:
         key = f"ans_{q['id']}"
         lov = _lov_from_choices(q.get("choices", []))
         parts.append(
-            f"<|part|class_name=card p-3 mb-2 shadow-sm|>"
+            f"<|part|class_name=card p-3 mb-2 shadow-sm|>\n"
             f"**{idx}. {q.get('question', 'Pertanyaan kosong')}**\n"
             f"<|{{{key}}}|selector|lov={lov}|dropdown|class_name=full-width|>\n"
-            f"|>"
+            "|>"
         )
     html = "\n".join(parts)
     logger.debug(f"render_quiz: built {len(parts)} blocks, length={len(html)}")
