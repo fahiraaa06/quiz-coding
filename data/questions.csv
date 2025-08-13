@@ -1,0 +1,6 @@
+id,question,choices,answer,points
+q1,Tipe data tak berurutan & unik di Python?,set|list|tuple|dict,set,10
+q2,Perintah membuat virtual env?,python -m venv .venv|pip venv .venv|conda venv|pyenv venv,python -m venv .venv,10
+q3,Library data tabular Python?,pandas|matplotlib|seaborn|opencv,pandas,10
+q4,SQL untuk mengurutkan hasil?,ORDER BY|GROUP BY|JOIN|WHERE,ORDER BY,10
+q5,Kompleksitas rata-rata pencarian dict?,O(1)|O(log n)|O(n)|O(n log n),O(1),10
