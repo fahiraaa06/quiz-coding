@@ -4,8 +4,7 @@ import csv
 import os
 import time
 from typing import Dict
-from components.config import USERS_FILE, RESULTS_FILE, ATTEMPT_LOG
-from state import PASSING_SCORE
+from components.config import USERS_FILE, RESULTS_FILE, ATTEMPT_LOG, PASSING_SCORE
 
 # ---------- Attempts (limit per user) ----------
 
