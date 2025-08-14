@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Coding Test | Bootcamp Post-Test{% endblock %}
+{% block content %}
+<!-- Tambahkan id="code-root" + data-deadline di container teratas -->
+<div class="card p-3" id="code-root" data-deadline="{{ deadline_ts|int }}">
+  <div class="d-flex justify-content-between align-items-center">
+    <h4 class="m-0">💻 Coding Test — {{ problem.title }}</h4>
+    <div class="timer" id="code_timer">⏳ --:--</div>
+  </div>
+  <hr/>
+
+  <div class="row g-3">
+    <div class="col-md-6">
+      <div class="card p-3">
+        <h5 class="mb-2">📘 Deskripsi Soal</h5>
+        <pre style="white-space:pre-wrap">{{ problem.prompt }}</pre>
+
+        <form method="post">
+          <div class="mb-3">
+            <label class="form-label" for="code_editor">Kode (Python)</label>
+            <textarea
+              id="code_editor"
+              class="form-control"
+              name="code"
+              rows="16"
+              data-disabled="{{ 1 if disabled else 0 }}"
+            >{{ code }}</textarea>
+          </div>
+
+          <!-- code-actions: container tombol (satu saja, tanpa duplikat) -->
+          <div class="d-flex gap-2" id="code-actions" data-disabled="{{ 1 if disabled else 0 }}">
+            <button type="submit" class="btn btn-outline-light" name="action" value="run" id="code_run">▶️ Jalankan & Cek</button>
+            <button type="submit" class="btn btn-primary" name="action" value="submit" id="code_submit">✅ Kumpulkan Jawaban</button>
+            <button type="submit" class="btn btn-secondary" name="action" value="clear" id="code_clear">🧹 Bersihkan Output</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card p-3">
+        <h5 class="mb-2">Output</h5>
+
+        {% if passed is not none and total is not none %}
+          <div class="alert alert-success">Lulus {{ passed }}/{{ total }} test.</div>
+        {% endif %}
+
+        {% if details %}
+          <details class="mb-2"><summary>Detail Hasil</summary>
+            <pre>{{ details | tojson(indent=2) }}</pre>
+          </details>
+        {% endif %}
+
+        {% if stdout %}
+          <h6>Stdout (print):</h6>
+          <pre>{{ stdout }}</pre>
+        {% endif %}
+
+        {% if error %}
+          <div class="alert alert-danger">Error saat eksekusi:</div>
+          <pre>{{ error }}</pre>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const root        = document.getElementById('code-root');
+  const deadlineSec = root ? parseInt(root.dataset.deadline, 10) : 0;
+
+  const timerEl   = document.getElementById('code_timer');
+  const runBtn    = document.getElementById('code_run');
+  const submitBtn = document.getElementById('code_submit');
+  const editor    = document.getElementById('code_editor');
+
+  const preDisabled = editor ? editor.dataset.disabled === '1' : false;
+  const endMs = deadlineSec * 1000;
+
+  const setDisabled = (state) => {
+    if (runBtn) runBtn.disabled = state;
+    if (submitBtn) {
+      submitBtn.disabled = state;
+      if (state) submitBtn.textContent = 'Waktu habis';
+    }
+    if (editor) editor.disabled = state;
+  };
+
+  setDisabled(preDisabled);
+
+  const tick = () => {
+    if (!endMs) return;
+    const left = Math.max(0, Math.floor((endMs - Date.now()) / 1000));
+    const m = String(Math.floor(left / 60)).padStart(2, '0');
+    const s = String(left % 60).padStart(2, '0');
+    if (timerEl) timerEl.textContent = `⏳ ${m}:${s}`;
+    if (left <= 0) setDisabled(true); else setTimeout(tick, 1000);
+  };
+
+  tick();
+})();
+</script>
+
+{% endblock %}

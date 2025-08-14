@@ -1,15 +1,33 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% block title %}Login | Bootcamp Post-Test{% endblock %}
 {% block content %}
-<h2 class="mb-4">Login</h2>
-<form method="post">
-  <div class="mb-3">
-    <label class="form-label">Email</label>
-    <input type="email" name="email" class="form-control" required>
+<div class="row justify-content-center">
+  <div class="col-md-5">
+    <div class="card p-4">
+      <h4 class="mb-3">🔐 Login</h4>
+
+      {% if post_mode %}
+        <div class="alert alert-info">
+          Silakan masuk menggunakan akun terdaftar.
+        </div>
+      {% endif %}
+
+      <form method="post" autocomplete="off">
+        <div class="mb-3">
+          <label class="form-label" for="uid">{{ identity_label|capitalize }}</label>
+          <input type="text" class="form-control" id="uid" name="uid" placeholder="email@example.com" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="pwd">Password</label>
+          <input type="password" class="form-control" id="pwd" name="pwd" placeholder="••••••••" required>
+        </div>
+        <button class="btn btn-primary w-100">Masuk</button>
+      </form>
+
+      <div class="mt-3 small text-secondary">
+        Format <code>data/users.csv</code> minimal: <code>email,password[,name]</code>
+      </div>
+    </div>
   </div>
-  <div class="mb-3">
-    <label class="form-label">Password</label>
-    <input type="password" name="password" class="form-control" required>
-  </div>
-  <button type="submit" class="btn btn-primary">Login</button>
-</form>
+</div>
 {% endblock %}
