@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-4">Result</h2>
+<p>Skor kamu: {{ score }}</p>
+<a href="{{ url_for('quiz') }}" class="btn btn-primary">Coba Lagi</a>
+{% endblock %}
