@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Hasil | {{ title or 'Quiz App' }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h3 class="mb-0">Hasil Kamu</h3>
+      <span class="badge text-bg-{{ 'success' if total >= passing else 'secondary' }}">
+        {{ 'Lulus' if total >= passing else 'Belum Lulus' }}
+      </span>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <table class="table table-sm mb-0">
+          <tbody>
+            <tr>
+              <th style="width: 220px;">Skor Quiz</th>
+              <td>{{ quiz_score }}</td>
+            </tr>
+            <tr>
+              <th>Skor Coding</th>
+              <td>{{ coding_score }}</td>
+            </tr>
+            <tr>
+              <th>Total</th>
+              <td><strong>{{ total }}</strong></td>
+            </tr>
+            <tr>
+              <th>Passing Score</th>
+              <td>{{ passing }}</td>
+            </tr>
+            <tr>
+              <th>Attempt</th>
+              <td>{{ used_attempts }}/{{ max_attempts }} (Sisa: {{ remaining_attempts }})</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <form method="post" class="text-end">
+      <button class="btn btn-primary"
+              type="submit"
+              {% if remaining_attempts <= 0 %}disabled{% endif %}>
+        Simpan Hasil
+      </button>
+      {% if remaining_attempts <= 0 %}
+        <small class="text-muted ms-2">Kesempatan habis</small>
+      {% endif %}
+    </form>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}{% endblock %}

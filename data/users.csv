@@ -1,4 +1,4 @@
-email,password
-peserta1@example.com,rahasia123
-peserta2@example.com,pass456
-admin@intelligo.id,intelligo-admin
+email,password,role
+peserta1@example.com,rahasia123,user
+peserta2@example.com,pass456,user
+admin@intelligo.id,intelligo-admin,admin

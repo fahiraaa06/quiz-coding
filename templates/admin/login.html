@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Login Admin | Bootcamp Post-Test{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-5">
+    <div class="card p-4">
+      <h4 class="mb-3">🛠️ Login Admin</h4>
+
+      <div class="alert alert-secondary">
+        Hanya untuk admin. Anda dapat mengelola bank soal, problem coding, dan mengatur post-test.
+      </div>
+
+      <form method="post" autocomplete="off">
+        <div class="mb-3">
+          <label class="form-label" for="uid">Email/Username</label>
+          <input type="text" class="form-control" id="uid" name="uid" placeholder="admin@example.com" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="pwd">Password</label>
+          <input type="password" class="form-control" id="pwd" name="pwd" placeholder="••••••••" required>
+        </div>
+        <button class="btn btn-dark w-100">Masuk</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

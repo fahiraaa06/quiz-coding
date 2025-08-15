@@ -1,0 +1,10 @@
+{
+  "id": "p1",
+  "title": "Sum of Numbers",
+  "prompt": "Buat fungsi sum_numbers(nums) yang menerima list angka dan mengembalikan jumlah semua angkanya.",
+  "examples": [
+    { "input": [1, 2, 3], "output": 6 },
+    { "input": [10, -5, 5], "output": 10 }
+  ],
+  "constraints": "1 <= len(nums) <= 1000; -1000 <= nums[i] <= 1000"
+}

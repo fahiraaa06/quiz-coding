@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="h4 mb-3">Kelola Problem Coding (JSON)</h1>
+
+<p class="text-muted mb-2">Folder sumber: <code>{{ problems_dir }}</code></p>
+
+{% if active_info %}
+  <div class="alert alert-info py-2">
+    Pointer aktif: <code>{{ active_info.path }}</code> —
+    <strong>{{ active_info.title }}</strong> ({{ active_info.points }} pts, {{ active_info.tests }} tests)
+    {% if active_name %} — cocok dengan <strong>{{ active_name }}</strong>{% else %} — <em>tidak cocok dengan kandidat manapun</em>{% endif %}
+  </div>
+{% else %}
+  <div class="alert alert-warning py-2">Belum ada file aktif (problem.json tidak ditemukan atau kosong).</div>
+{% endif %}
+
+<form method="post" class="card shadow-sm">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-sm align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>File</th>
+            <th>Judul</th>
+            <th>Poin</th>
+            <th>#Tests</th>
+            <th style="width:120px;">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for f in files %}
+          <tr>
+            <td><code>{{ f }}</code></td>
+            <td>{{ metas.get(f, {}).get("title") }}</td>
+            <td>{{ metas.get(f, {}).get("points") }}</td>
+            <td>{{ metas.get(f, {}).get("tests") }}</td>
+            <td>
+              {% if active_name != f %}
+                <button class="btn btn-sm btn-outline-primary"
+                        type="submit" name="activate" value="1"
+                        onclick="document.getElementById('name').value='{{ f }}'">
+                  Aktifkan
+                </button>
+              {% else %}
+                <span class="badge text-bg-success">Aktif</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <input type="hidden" id="name" name="name" value="">
+  </div>
+</form>
+{% endblock %}

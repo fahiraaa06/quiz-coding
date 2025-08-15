@@ -1,76 +1,119 @@
 # routes/_helpers.py
-import os, csv, json, time, random
+from __future__ import annotations
+
+import os
+import csv
+import time
 from datetime import datetime
-from typing import List, Dict, Any
+from typing import Tuple, Dict
+
 from components.config import (
-    RESULTS_FILE, ATTEMPT_LOG, PASSING_SCORE,
-    POST_TEST_MODE, POST_START, POST_END
+    RESULTS_FILE,
+    ATTEMPT_LOG,
+    PASSING_SCORE,
 )
-from components.constants import DEFAULT_QUESTIONS
+from utils.settings import (
+    get_post_window,          # baca start/end (bisa diubah admin) atau fallback config
+    window_open as _win_open, # penentu apakah 'now' dalam window
+)
 
+
+# =========================
+# Post-test window helpers
+# =========================
 def window_open(now: datetime) -> bool:
-    if not POST_TEST_MODE:
-        return True
-    return POST_START <= now <= POST_END
+    """
+    True jika waktu 'now' berada dalam jendela post-test yang aktif.
+    Catatan: pemanggil bebas memutuskan apakah window ini dipakai
+    (mis. dibarengi POST_TEST_MODE di config).
+    """
+    return _win_open(now)
 
-def ensure_results_header():
-    if not os.path.exists(RESULTS_FILE) or os.path.getsize(RESULTS_FILE) == 0:
-        with open(RESULTS_FILE, "w", newline="", encoding="utf-8") as f:
-            csv.writer(f).writerow(["user","quiz_score","coding_score","total","passed","timestamp"])
 
-def read_attempts() -> Dict[str, int]:
-    if not os.path.exists(ATTEMPT_LOG) or os.path.getsize(ATTEMPT_LOG) == 0:
-        return {}
-    data = {}
-    with open(ATTEMPT_LOG, newline="", encoding="utf-8") as f:
-        for name, attempts in csv.reader(f):
-            data[name] = int(attempts)
-    return data
+def get_posttest_window() -> Tuple[datetime, datetime]:
+    """
+    Mengembalikan (start, end) jendela post-test yang berlaku sekarang,
+    berasal dari settings admin (jika ada) atau fallback dari config.
+    """
+    return get_post_window()
 
-def write_attempt(user: str, value: int):
-    data = read_attempts()
-    data[user] = value
-    with open(ATTEMPT_LOG, "w", newline="", encoding="utf-8") as f:
+
+# =========================
+# Results.csv helpers
+# =========================
+def ensure_results_header() -> None:
+    """
+    Pastikan RESULTS_FILE memiliki header standar.
+    Header: user,quiz_score,coding_score,total,passed,timestamp
+    """
+    need_header = (not os.path.exists(RESULTS_FILE)) or (os.path.getsize(RESULTS_FILE) == 0)
+    if not need_header:
+        return
+
+    parent = os.path.dirname(RESULTS_FILE)
+    if parent:
+        os.makedirs(parent, exist_ok=True)
+
+    with open(RESULTS_FILE, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        for k, v in data.items():
-            w.writerow([k, v])
+        w.writerow(["user", "quiz_score", "coding_score", "total", "passed", "timestamp"])
 
-def attempts_left(user: str, max_attempts: int) -> int:
-    used = read_attempts().get(user, 0)
-    return max(0, max_attempts - used)
 
-def save_result(user: str, quiz_score: int, coding_score: int):
+def save_result(user: str, quiz_score: int, coding_score: int) -> tuple[int, int]:
+    """
+    Tambahkan 1 baris hasil.
+    Return: (total, passed[0/1])
+    """
     ensure_results_header()
-    total = quiz_score + coding_score
+    total = int(quiz_score) + int(coding_score)
     passed = int(total >= PASSING_SCORE)
     with open(RESULTS_FILE, "a", newline="", encoding="utf-8") as f:
         csv.writer(f).writerow([user, quiz_score, coding_score, total, passed, int(time.time())])
     return total, passed
 
-def load_questions(path="data/questions.csv", sample: int = 5) -> List[Dict[str, Any]]:
-    if not os.path.exists(path) or os.path.getsize(path) == 0:
-        qs = DEFAULT_QUESTIONS.copy()
-    else:
-        qs = []
-        with open(path, newline="", encoding="utf-8") as f:
-            r = csv.DictReader(f)
-            for row in r:
-                choices_raw = (row.get("choices") or "").strip()
-                if choices_raw.startswith("["):
-                    try:
-                        choices = json.loads(choices_raw)
-                    except Exception:
-                        choices = []
-                else:
-                    choices = [c.strip() for c in choices_raw.split("|") if c.strip()]
-                qs.append({
-                    "id": row.get("id") or f"q_{len(qs)+1}",
-                    "question": (row.get("question") or "").strip(),
-                    "choices": choices,
-                    "answer": (row.get("answer") or "").strip(),
-                    "points": int(row.get("points") or 10),
-                })
-        if not qs:
-            qs = DEFAULT_QUESTIONS.copy()
-    random.shuffle(qs)
-    return qs[:max(1, min(sample, len(qs)))]
+
+# =========================
+# Attempts.csv helpers
+# =========================
+def read_attempts() -> Dict[str, int]:
+    """
+    Baca ATTEMPT_LOG → dict {user: attempts}
+    """
+    if not os.path.exists(ATTEMPT_LOG) or os.path.getsize(ATTEMPT_LOG) == 0:
+        return {}
+    data: Dict[str, int] = {}
+    with open(ATTEMPT_LOG, newline="", encoding="utf-8") as f:
+        r = csv.reader(f)
+        for row in r:
+            if not row:
+                continue
+            name = (row[0] or "").strip()
+            try:
+                attempts = int(row[1])
+            except (IndexError, ValueError, TypeError):
+                attempts = 0
+            if name:
+                data[name] = attempts
+    return data
+
+
+def write_attempt(user: str, value: int) -> None:
+    """
+    Tulis ulang ATTEMPT_LOG dengan update untuk user tertentu.
+    """
+    parent = os.path.dirname(ATTEMPT_LOG)
+    if parent:
+        os.makedirs(parent, exist_ok=True)
+
+    data = read_attempts()
+    data[user] = int(value)
+
+    with open(ATTEMPT_LOG, "w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        for k, v in data.items():
+            w.writerow([k, v])
+
+
+def attempts_left(user: str, max_attempts: int) -> int:
+    used = read_attempts().get(user, 0)
+    return max(0, int(max_attempts) - int(used))

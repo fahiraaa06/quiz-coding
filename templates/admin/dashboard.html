@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="h4 mb-3">Admin Dashboard</h1>
+
+{# Ringkasan File Aktif & KPI #}
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Ringkasan Quiz (CSV Aktif)</h5>
+        <dl class="row mb-0">
+          <dt class="col-sm-4">Nama</dt>
+          <dd class="col-sm-8">{{ summary.active_quiz.name }}</dd>
+
+          <dt class="col-sm-4">Jumlah Soal</dt>
+          <dd class="col-sm-8">{{ summary.active_quiz.count or 0 }}</dd>
+
+          <dt class="col-sm-4">File</dt>
+          <dd class="col-sm-8"><code>{{ summary.active_quiz.path }}</code></dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Ringkasan Problem Coding (JSON Aktif)</h5>
+        <dl class="row mb-0">
+          <dt class="col-sm-4">Nama</dt>
+          <dd class="col-sm-8">{{ summary.active_problem.name }}</dd>
+
+          <dt class="col-sm-4">Judul</dt>
+          <dd class="col-sm-8">{{ summary.active_problem.meta.title }}</dd>
+
+          <dt class="col-sm-4">#Tests</dt>
+          <dd class="col-sm-8">{{ summary.active_problem.meta.tests }}</dd>
+
+          <dt class="col-sm-4">File</dt>
+          <dd class="col-sm-8"><code>{{ summary.active_problem.path }}</code></dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mt-1">
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title mb-3">KPI Hari Ini</h5>
+        <div class="row text-center">
+          <div class="col-4">
+            <div class="h2 mb-0">{{ summary.kpi.today_submissions }}</div>
+            <div class="text-muted small">Submissions</div>
+          </div>
+          <div class="col-4">
+            <div class="h2 mb-0">{{ summary.kpi.today_pass_rate }}</div>
+            <div class="text-muted small">Pass Rate</div>
+          </div>
+          <div class="col-4">
+            <div class="h2 mb-0">{{ summary.kpi.avg_total_today }}</div>
+            <div class="text-muted small">Avg Total</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# Aksi cepat #}
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Aksi Cepat</h5>
+        <div class="d-flex flex-wrap gap-2">
+          <form method="post">
+            <button class="btn btn-outline-secondary" name="reset_attempts" value="1" type="submit">
+              Reset <code>attempts.csv</code>
+            </button>
+          </form>
+          <form method="post">
+            <button class="btn btn-outline-secondary" name="reset_results" value="1" type="submit">
+              Reset <code>results.csv</code>
+            </button>
+          </form>
+          <form method="post">
+            <button class="btn btn-outline-danger" name="reset_deadline_global" value="1" type="submit"
+                    onclick="return confirm('Reset semua deadline (quiz & code) untuk SEMUA user?');">
+              Reset Deadline GLOBAL
+            </button>
+          </form>
+        </div>
+
+        <hr class="my-3">
+        <div class="small text-muted">
+          <div>results: {{ summary.files.results.size }} bytes</div>
+          <div>attempts: {{ summary.files.attempts.size }} bytes</div>
+          <div>sessions: {{ summary.files.sessions.size }} bytes</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# Leaderboard #}
+<div class="card shadow-sm mt-4">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="card-title mb-0">Leaderboard</h5>
+      <div class="btn-group btn-group-sm" role="group">
+        {% if sort_order == 'asc' %}
+          <a class="btn btn-outline-secondary active" href="{{ url_for('admin.dashboard', sort='asc') }}">ASC</a>
+          <a class="btn btn-outline-secondary" href="{{ url_for('admin.dashboard', sort='desc') }}">DESC</a>
+        {% else %}
+          <a class="btn btn-outline-secondary" href="{{ url_for('admin.dashboard', sort='asc') }}">ASC</a>
+          <a class="btn btn-outline-secondary active" href="{{ url_for('admin.dashboard', sort='desc') }}">DESC</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-sm align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>User</th>
+            <th>Quiz</th>
+            <th>Coding</th>
+            <th>Total</th>
+            <th>Timestamp</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in leaderboard_rows %}
+          <tr>
+            <td>{{ r.get('user') or r.get('uid') }}</td>
+            <td>{{ r.get('quiz_score') }}</td>
+            <td>{{ r.get('coding_score') }}</td>
+            <td>{{ r.get('total') }}</td>
+            <td>{{ r.get('timestamp') or r.get('ts') }}</td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5" class="text-muted fst-italic">Belum ada data.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

@@ -9,6 +9,7 @@ WIB = timezone(timedelta(hours=7))
 POST_TEST_MODE = True
 POST_START = datetime(2025, 8, 7, 9, 0, tzinfo=WIB)
 POST_END   = datetime(2025, 8, 31, 23, 59, tzinfo=WIB)
+POST_WINDOW_FILE = "data/post_window.json"
 
 # Parameter penilaian & durasi
 PASSING_SCORE = 70
@@ -24,6 +25,15 @@ USERS_FILE = "data/users.csv"
 RESULTS_FILE = "data/results.csv"
 ATTEMPT_LOG = "data/attempts.csv"
 SESSIONS_FILE = "data/sessions.csv"
+
+QUESTIONS_ACTIVE     = "data/questions.csv"
+PROBLEM_ACTIVE_FILE  = "data/problems.json"
+
+QUESTIONS_DIR        = "data/questions"
+PROBLEMS_DIR         = "data/problems"
+
+# NEW: manifest aktif
+ACTIVE_MANIFEST      = "data/active.json"
 
 # Admin
 ADMIN_PASSWORD = os.environ.get("BOOTCAMP_ADMIN_PASS", "intelligo-admin")
