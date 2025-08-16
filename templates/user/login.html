@@ -8,13 +8,12 @@
   <div class="login-card">
     <div class="logo-section">
       <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo-img">
-      <h1>Selamat Datang</h1>
-      <p class="subtitle">Masuk ke akun Anda untuk melanjutkan</p>
+      <h1>Post Test Bootcamp</h1>
+      <p class="subtitle">Silakan masuk menggunakan akun terdaftar.</p>
     </div>
 
     {% if post_mode %}
     <div class="post-window-info">
-      Silakan masuk menggunakan akun terdaftar.<br>
       <small>
         Jendela post-test: {{ post_start.strftime("%d %B %Y %H:%M") }} WIB
         &ndash; {{ post_end.strftime("%d %B %Y %H:%M") }} WIB
