@@ -1,33 +1,44 @@
-{% extends "base.html" %}
-{% block title %}Login Peserta | Bootcamp Post-Test{% endblock %}
+{% extends "user/base.html" %}
+
+{% set body_class = 'login-page' %}
+{% set layout_class = 'no-wrapper' %}
+
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-md-5">
-    <div class="card p-4">
-      <h4 class="mb-3">🔐 Login Peserta</h4>
-
-      {% if post_mode %}
-        <div class="alert alert-info">
-          Silakan masuk menggunakan akun terdaftar.<br>
-          <small>
-            Jendela post-test: {{ post_start.strftime("%d %B %Y %H:%M") }} WIB
-            &ndash; {{ post_end.strftime("%d %B %Y %H:%M") }} WIB
-          </small>
-        </div>
-      {% endif %}
-
-      <form method="post" autocomplete="off">
-        <div class="mb-3">
-          <label class="form-label" for="uid">{{ identity_label|capitalize }}</label>
-          <input type="text" class="form-control" id="uid" name="uid" placeholder="email@example.com" required>
-        </div>
-        <div class="mb-3">
-          <label class="form-label" for="pwd">Password</label>
-          <input type="password" class="form-control" id="pwd" name="pwd" placeholder="••••••••" required>
-        </div>
-        <button class="btn btn-primary w-100">Masuk</button>
-      </form>
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="logo-section">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo-img">
+      <h1>Selamat Datang</h1>
+      <p class="subtitle">Masuk ke akun Anda untuk melanjutkan</p>
     </div>
+
+    {% if post_mode %}
+    <div class="post-window-info">
+      Silakan masuk menggunakan akun terdaftar.<br>
+      <small>
+        Jendela post-test: {{ post_start.strftime("%d %B %Y %H:%M") }} WIB
+        &ndash; {{ post_end.strftime("%d %B %Y %H:%M") }} WIB
+      </small>
+    </div>
+    {% endif %}
+
+    <form method="post" autocomplete="on" id="loginForm">
+      <div class="form-group">
+        <label for="uid">{{ identity_label|capitalize }}</label>
+        <div class="input-wrapper">
+          <input id="uid" name="uid" type="text" placeholder="email@example.com" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="pwd">Password</label>
+        <div class="input-wrapper">
+          <input id="pwd" name="pwd" type="password" placeholder="Masukkan password" required>
+        </div>
+      </div>
+
+      <button type="submit" class="login-btn">Masuk</button>
+    </form>
   </div>
 </div>
 {% endblock %}
