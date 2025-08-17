@@ -3,15 +3,31 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>{{ title or "Bootcamp Assessment" }}</title>
+
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <!-- Global CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
     {% block head %}{% endblock %}
 </head>
-<body class="{{ body_class|default('') }}">
-    <div class="page-wrapper {{ layout_class|default('') }}">
+<body>
+    <div class="page-wrapper">
         {% block content %}{% endblock %}
     </div>
+
+    <!-- Bootstrap Bundle (with Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Global JS untuk quiz -->
+    <script src="{{ url_for('static', filename='js/quiz.js') }}"></script>
+
     {% block scripts %}{% endblock %}
 </body>
 </html>

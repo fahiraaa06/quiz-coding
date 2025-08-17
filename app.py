@@ -4,18 +4,22 @@ from flask import Flask
 
 def create_app():
     app = Flask(__name__)
-    app.config["SECRET_KEY"] = "change-me-in-prod"  # sebaiknya ambil dari env
+    app.config["SECRET_KEY"] = "change-me-in-prod"
 
     # Register blueprints
     from routes import auth
-    from routes.user import quiz, code, result
+    from routes.user import quiz, code, result, assessment
     from routes.admin import dashboard, questions, problems
 
     app.register_blueprint(auth.bp)
+
+    # Register user blueprints
+    app.register_blueprint(assessment.bp)
     app.register_blueprint(quiz.bp)
     app.register_blueprint(code.bp)
     app.register_blueprint(result.bp)
 
+    # Register admin blueprints
     app.register_blueprint(dashboard.bp)
     app.register_blueprint(questions.bp)
     app.register_blueprint(problems.bp)

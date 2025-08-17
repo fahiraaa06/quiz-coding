@@ -1,0 +1,27 @@
+{% extends "user/base.html" %}
+{% block content %}
+<div class="container">
+    <div class="header">
+        <h1>Bootcamp Assessment</h1>
+        <p>Showcase your expertise with our interactive evaluation platform</p>
+    </div>
+
+    <div class="test-selection">
+        <a href="{{ url_for('assessment.quiz') }}" class="test-card">
+            <span class="card-icon">🧠</span>
+            <h3>Knowledge Quiz</h3>
+            <p>Test your theoretical understanding</p>
+            <p>Multiple choice questions covering core concepts</p>
+            <div class="duration">12 Minutes</div>
+        </a>
+
+        <a href="{{ url_for('assessment.coding') }}" class="test-card">
+            <span class="card-icon">⚡</span>
+            <h3>Coding Challenge</h3>
+            <p>Demonstrate your programming skills</p>
+            <p>Solve algorithmic problems with clean code</p>
+            <div class="duration">60 Minutes</div>
+        </a>
+    </div>
+</div>
+{% endblock %}

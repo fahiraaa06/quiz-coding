@@ -1,65 +1,84 @@
-{# templates/user/quiz.html #}
 {% extends "user/base.html" %}
 {% block content %}
-<header class="site-header">
-    <h1>Quiz Pilihan Ganda</h1>
-</header>
-<main class="content">
-    <section class="card">
-        <div id="questionContainer">
-            <!-- Daftar pertanyaan di-render di sini melalui Jinja -->
-            {% for q in questions %}
-                <div class="question-card">
-                    <div class="question-number">Question {{ loop.index }}</div>
-                    <div class="question-text">{{ q.question }}</div>
-                    <div class="options">
-                        {% for c in q.choices %}
-                        <label class="option">
-                            <input type="radio" name="{{ q.id }}" value="{{ c }}" required>
-                            <span>{{ c }}</span>
-                        </label>
-                        {% endfor %}
-                    </div>
-                </div>
-            {% endfor %}
-            <button class="btn primary-btn" type="submit">Submit Quiz</button>
-        </div>
-    </section>
-</main>
-{% endblock %}
-{% block scripts %}
+<div class="container" id="quiz-root"
+     data-deadline="{{ deadline_ts }}"
+     data-disabled="{{ 1 if disabled else 0 }}"
+     data-passing="{{ passing }}">
+  <!-- Header -->
+  <div class="header text-center my-4">
+    <h1>Post Test Quiz</h1>
+    <p class="text-muted">Jawablah semua pertanyaan dengan benar sebelum waktu habis</p>
+  </div>
 
-<script>
-(() => {
-  const root        = document.getElementById('quiz-root');
-  const form        = document.getElementById('quiz-form');
-  const timerEl     = document.getElementById('quiz_timer');
-  const submitBtn   = document.getElementById('quiz_submit');
-  const radios      = root.querySelectorAll('input[type="radio"]');
+  <!-- Progress / Timer -->
+  <div class="progress-container mb-4">
+    <div class="progress-header d-flex justify-content-between align-items-center mb-2">
+      <div class="question-counter">
+        <span id="counter">1</span> / {{ questions|length }}
+      </div>
+      <div class="timer" id="quiz_timer">⏱️ {{ minutes }}:00</div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress_fill" style="width:0"></div>
+    </div>
+  </div>
 
-  const deadlineSec = root ? parseInt(root.dataset.deadline, 10) : 0;
-  const preDisabled = root ? root.dataset.disabled === '1' : false;
-  const endMs       = deadlineSec * 1000;
+  <!-- Form Quiz -->
+  <form method="post" id="quiz-form">
+    {% set letters = ['A','B','C','D','E','F'] %}
+    {% for q in questions %}
+    <div class="quiz-card step"
+         data-step="{{ loop.index0 }}"
+         data-correct="{{ q.answer }}"
+         {% if not loop.first %}style="display:none"{% endif %}>
+      <div class="question mb-3">
+        <strong>{{ loop.index }}.</strong> {{ q.question }}
+      </div>
+      <div class="answers">
+        {% for c in q.choices %}
+        <label class="answer-option">
+          <input type="radio" name="{{ q.id }}" value="{{ c }}" required>
+          <span class="answer-letter">{{ letters[loop.index0] }}</span>
+          <span class="answer-text">{{ c }}</span>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
 
-  const setDisabled = (state) => {
-    if (submitBtn) submitBtn.disabled = state;
-    radios.forEach(r => r.disabled = state);
-    if (state && submitBtn) submitBtn.textContent = 'Waktu habis';
-  };
+    <!-- Controls -->
+    <div class="controls mt-4 d-flex justify-content-between">
+      <button type="button" class="btn secondary" id="prevBtn" disabled>← Previous</button>
+      <div>
+        <button type="button" class="btn" id="nextBtn">Next →</button>
+        <button type="submit" class="btn success" id="submitBtn" style="display:none">🎯 Submit Quiz</button>
+      </div>
+    </div>
+  </form>
+</div>
 
-  // Terapkan kondisi awal dari server
-  setDisabled(preDisabled);
+<!-- === Modal Result === -->
+<div id="resultModal" class="result-modal hidden">
+  <div class="modal-content text-center p-4">
+    <div class="celebration" id="modalIcon"></div>
+    <h3 id="modalTitle"></h3>
+    <div class="score-display" id="modalScore">0%</div>
+    <p id="modalDesc">0 out of {{ questions|length if questions else '' }} questions correct</p>
 
-  const tick = () => {
-    if (!endMs) return; // tidak ada deadline -> tanpa timer
-    const left = Math.max(0, Math.floor((endMs - Date.now()) / 1000));
-    const m = String(Math.floor(left / 60)).padStart(2, '0');
-    const s = String(left % 60).padStart(2, '0');
-    if (timerEl) timerEl.textContent = `⏳ ${m}:${s}`;
-    if (left <= 0) setDisabled(true); else setTimeout(tick, 1000);
-  };
+    {% if go_to_coding %}
+      <!-- User baru selesai QUIZ -->
+      <a href="{{ url_for('code.code') }}" class="btn btn-primary mb-2">Lanjut ke Coding Test</a>
+      <a href="{{ url_for('result.result') }}" class="btn btn-outline-secondary mb-2">Lihat Detail Skor</a>
+    {% elif go_to_quiz %}
+      <!-- User baru selesai CODING -->
+      <a href="{{ url_for('quiz.quiz') }}" class="btn btn-primary mb-2">Lanjut ke Quiz</a>
+      <a href="{{ url_for('result.result') }}" class="btn btn-outline-secondary mb-2">Lihat Detail Skor</a>
+    {% else %}
+      <!-- Kalau sudah ngerjain dua-duanya -->
+      <a href="{{ url_for('result.result') }}" class="btn btn-primary mb-2">Lihat Detail Skor</a>
+    {% endif %}
+  </div>
+</div>
 
-  tick();
-})();
-</script>
+
 {% endblock %}

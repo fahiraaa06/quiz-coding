@@ -2,7 +2,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from components.config import PASSING_SCORE, MAX_ATTEMPTS
 from routes._helpers import save_result, read_attempts, write_attempt
-from utils.quiz_utils import attempts_left   # sudah benar dipindah ke sini
+from utils.quiz_utils import attempts_left
 from utils.authz import login_required
 
 bp = Blueprint("result", __name__)
@@ -18,21 +18,16 @@ def result():
     coding_score = int(session.get("coding_score", 0))
     total = quiz_score + coding_score
 
-    # Hitung sisa kesempatan saat ini
+    # Hitung sisa kesempatan
     used_attempts = read_attempts().get(uid, 0)
     remaining = max(0, MAX_ATTEMPTS - used_attempts)
 
     if request.method == "POST":
-        # Cek sisa kesempatan sebelum simpan
         if attempts_left(uid, MAX_ATTEMPTS) <= 0:
             flash("Kesempatan habis. Tidak bisa menyimpan.", "warning")
-            # kembali ke halaman result saja
             return redirect(url_for("result.result"))
 
-        # Simpan hasil
         total_after_save, passed = save_result(uid, quiz_score, coding_score)
-
-        # Update counter attempts
         used = used_attempts + 1
         write_attempt(uid, used)
 
@@ -41,10 +36,9 @@ def result():
             f"Attempt: {used}/{MAX_ATTEMPTS}",
             "success"
         )
-        # Tidak ada leaderboard → kembali ke halaman result
         return redirect(url_for("result.result"))
 
-    # GET: render halaman result
+    # GET
     return render_template(
         "user/result.html",
         quiz_score=quiz_score,

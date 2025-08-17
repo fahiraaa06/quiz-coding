@@ -1,8 +1,4 @@
 {% extends "user/base.html" %}
-
-{% set body_class = 'login-page' %}
-{% set layout_class = 'no-wrapper' %}
-
 {% block content %}
 <div class="login-wrapper">
   <div class="login-card">
@@ -21,18 +17,22 @@
     </div>
     {% endif %}
 
-    <form method="post" autocomplete="on" id="loginForm">
+    <form method="post" id="loginForm" autocomplete="on">
       <div class="form-group">
         <label for="uid">{{ identity_label|capitalize }}</label>
         <div class="input-wrapper">
-          <input id="uid" name="uid" type="text" placeholder="email@example.com" required>
+         <input id="uid" name="uid" type="text" placeholder="email@example.com" required>
         </div>
       </div>
 
       <div class="form-group">
         <label for="pwd">Password</label>
-        <div class="input-wrapper">
-          <input id="pwd" name="pwd" type="password" placeholder="Masukkan password" required>
+        <div class="input-wrapper password-wrapper">
+          <input id="pwd" name="pwd" type="password" placeholder="Masukkan password"
+                 required autocomplete="current-password">
+          <span class="toggle-password" onclick="togglePassword()">
+            <i class="fa-solid fa-eye"></i>
+          </span>
         </div>
       </div>
 
@@ -40,4 +40,22 @@
     </form>
   </div>
 </div>
+
+<!-- ✅ Script toggle eye -->
+<script>
+function togglePassword() {
+  const pwdField = document.getElementById("pwd");
+  const toggleIcon = document.querySelector(".toggle-password i");
+
+  if (pwdField.type === "password") {
+    pwdField.type = "text";
+    toggleIcon.classList.remove("fa-eye");
+    toggleIcon.classList.add("fa-eye-slash");
+  } else {
+    pwdField.type = "password";
+    toggleIcon.classList.remove("fa-eye-slash");
+    toggleIcon.classList.add("fa-eye");
+  }
+}
+</script>
 {% endblock %}

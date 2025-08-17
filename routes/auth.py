@@ -74,7 +74,7 @@ def user_login():
         session["name"] = info.get("name") or uid
         session["role"] = "user"
         upsert_session(uid, login_at_ts=int(datetime.now(WIB).timestamp()))
-        return redirect(url_for("quiz.quiz"))
+        return redirect(url_for("assessment.choose_test"))
 
     return render_template(
         "user/login.html",

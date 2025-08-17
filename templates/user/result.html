@@ -1,60 +1,87 @@
-{% extends "base.html" %}
-
-{% block title %}Hasil | {{ title or 'Quiz App' }}{% endblock %}
-
+{% extends "user/base.html" %}
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-lg-8">
-
-    <div class="d-flex align-items-center justify-content-between mb-3">
-      <h3 class="mb-0">Hasil Kamu</h3>
-      <span class="badge text-bg-{{ 'success' if total >= passing else 'secondary' }}">
-        {{ 'Lulus' if total >= passing else 'Belum Lulus' }}
-      </span>
-    </div>
-
-    <div class="card mb-4">
-      <div class="card-body">
-        <table class="table table-sm mb-0">
-          <tbody>
-            <tr>
-              <th style="width: 220px;">Skor Quiz</th>
-              <td>{{ quiz_score }}</td>
-            </tr>
-            <tr>
-              <th>Skor Coding</th>
-              <td>{{ coding_score }}</td>
-            </tr>
-            <tr>
-              <th>Total</th>
-              <td><strong>{{ total }}</strong></td>
-            </tr>
-            <tr>
-              <th>Passing Score</th>
-              <td>{{ passing }}</td>
-            </tr>
-            <tr>
-              <th>Attempt</th>
-              <td>{{ used_attempts }}/{{ max_attempts }} (Sisa: {{ remaining_attempts }})</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <form method="post" class="text-end">
-      <button class="btn btn-primary"
-              type="submit"
-              {% if remaining_attempts <= 0 %}disabled{% endif %}>
-        Simpan Hasil
-      </button>
-      {% if remaining_attempts <= 0 %}
-        <small class="text-muted ms-2">Kesempatan habis</small>
-      {% endif %}
-    </form>
-
-  </div>
+<div class="results-header">
+    <h1 class="results-title">Your Results</h1>
+    <p class="results-subtitle">Here's how you performed on your assessment</p>
 </div>
-{% endblock %}
 
-{% block scripts %}{% endblock %}
+<div class="results-card">
+    <!-- Individual Scores -->
+    <div class="score-grid">
+        <div class="score-item">
+            <div class="score-label">Quiz Score</div>
+            <div class="score-value">{{ quiz_score }}</div>
+            <div style="font-size: 0.8rem; opacity: 0.8;">out of 100</div>
+        </div>
+
+        <div class="score-item">
+            <div class="score-label">Coding Score</div>
+            <div class="score-value">{{ coding_score }}</div>
+            <div style="font-size: 0.8rem; opacity: 0.8;">out of 100</div>
+        </div>
+    </div>
+
+    <!-- Total Score -->
+    <div class="total-score">
+        <div class="total-label">Total Score</div>
+        <div class="total-value">{{ total }}</div>
+        <div class="passing-info">Passing Score: {{ passing }}</div>
+        <div class="status-badge {% if total >= passing %}status-pass{% else %}status-fail{% endif %}">
+            {% if total >= passing %}✓ PASSED{% else %}✗ FAILED{% endif %}
+        </div>
+    </div>
+
+    <!-- Attempts Section -->
+    <div class="attempts-section">
+        <div class="attempts-title">
+            <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+            </svg>
+            Attempt Information
+        </div>
+
+        <div class="attempts-content">
+            <div class="attempts-used">
+                <span>Used: <strong>{{ used_attempts }} out of {{ max_attempts }}</strong></span>
+            </div>
+
+            <div class="attempts-bar">
+                <div class="attempts-progress" style="width: {{ (used_attempts / max_attempts * 100)|round(1) }}%"></div>
+            </div>
+
+            <div class="attempts-remaining {% if remaining_attempts == 0 %}no-attempts{% endif %}">
+                {{ remaining_attempts }} attempts remaining
+            </div>
+        </div>
+    </div>
+    <!-- Back Button -->
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="{{ url_for('assessment.choose_test') }}" class="btn-back">← Back to Choose Test</a>
+    </div>
+</div>
+
+<script>
+    // Add some interactive animations
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate the progress bar
+        const progressBar = document.querySelector('.attempts-progress');
+        if (progressBar) {
+            const targetWidth = progressBar.style.width;
+            progressBar.style.width = '0%';
+            setTimeout(() => {
+                progressBar.style.width = targetWidth;
+            }, 500);
+        }
+
+        // Add click effects to score items
+        document.querySelectorAll('.score-item').forEach(item => {
+            item.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        });
+    });
+</script>
+{% endblock %}
